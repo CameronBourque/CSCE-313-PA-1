@@ -40,15 +40,14 @@ BlockHeader* BuddyAllocator::merge (BlockHeader* block1, BlockHeader* block2){
 }
 
 BlockHeader* BuddyAllocator::split (BlockHeader* block){
-  BlockHeader* start = getbuddy(block);
-  start->block_size = block->block_size >> 1;
-  start->next = block->next;
-  start->is_free = true;
-  //Push (BlockHeader*)start into freelist
+  //Moves block into new position in freelist
+  block->block_size >> 1; //do this first so it finds the buddy for the split size
+  BlockHeader* newBlock = getbuddy(block);
+  newBlock->block_size = block->block_size;
+  newBlock->is_free = true;
+  //Push newBlock and block into freelist (this will set its next)
 
-  block->block_size = block->block_size/2;
-  block->next = ((BlockHeader*) start);
-  return block;
+  return newBlock;
 }
 
 void* BuddyAllocator::alloc(int length) {
@@ -69,6 +68,7 @@ void* BuddyAllocator::alloc(int length) {
 
 void BuddyAllocator::free(void* a) {
   /* Same here! */
+  //FILL
   ::free (a);
 }
 
