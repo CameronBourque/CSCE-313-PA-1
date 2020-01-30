@@ -58,9 +58,10 @@ public:
 class BuddyAllocator{
 private:
 	/* declare more member variables as necessary */
-	vector<LinkedList> FreeList;
+	vector<LinkedList> FreeList; //each linked list is a block size for easy access for inserts
 	int basic_block_size;
 	int total_memory_size;
+	BlockHeader* start;
 
 private:
 	/* private function you are required to implement

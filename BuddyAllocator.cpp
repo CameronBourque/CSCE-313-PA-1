@@ -4,6 +4,7 @@ using namespace std;
 
 BuddyAllocator::BuddyAllocator (int _basic_block_size, int _total_memory_length){
   basic_block_size = _basic_block_size, total_memory_size = _total_memory_length;
+  start = (BlockHeader*)(new char[_total_memory_length]); //may do rounding up for powers of 2!!!!
 }
 
 BuddyAllocator::~BuddyAllocator (){
@@ -11,29 +12,38 @@ BuddyAllocator::~BuddyAllocator (){
 }
 
 BlockHeader* BuddyAllocator::getbuddy (BlockHeader * addr){
-  //BlockHeader* buddy = addr ^ addr->block_size;
+  return (BlockHeader*) (( ((int) ( ((char*)addr) - ((char*) start)) ) ^ addr->block_size ) + (char*) start);
+/* IS THIS NEEDED???
+  if(arebuddies(addr, ret)){
+      return ret;
+  }
+  else{
+      return NULL;
+  }
+  */
 }
 
 bool BuddyAllocator::arebuddies (BlockHeader* block1, BlockHeader* block2){
-  return (block1->block_size == block2->block_size) && (block1->next == block2);
+  return block1->block_size == block2->block_size;
 }
 
 BlockHeader* BuddyAllocator::merge (BlockHeader* block1, BlockHeader* block2){
-    if(block1->next != block2)
-    {
-        block2->block_size = block2->block_size*2;
+    //do we need to clean up the space where block 2 is or is it safe to leave it to be overwritten??
+    if(block1 < block2){
+        block1->block_size *= 2;
+        return block1;
+    }
+    else{
+        block2->block_size *= 2;
         return block2;
     }
-    block1->block_size = block1->block_size*2;
-    return block1;
 }
 
 BlockHeader* BuddyAllocator::split (BlockHeader* block){
-  char* start = block;
-  start += block->block_size >> 1;
-  ((BlockHeader*)start)->block_size = block->block_size >> 1;
-  ((BlockHeader*)start)->next = block->next;
-  ((BlockHeader*)start)->is_free = true;
+  BlockHeader* start = getbuddy(block);
+  start->block_size = block->block_size >> 1;
+  start->next = block->next;
+  start->is_free = true;
   //Push (BlockHeader*)start into freelist
 
   block->block_size = block->block_size/2;
@@ -46,10 +56,12 @@ void* BuddyAllocator::alloc(int length) {
      the C standard library! 
      Of course this needs to be replaced by your implementation.
   */
-  if(length > total_memory_size)
+  int memSpace = length + sizeof(BlockHeader);
+  if(memSpace > total_memory_size)
   {
       return NULL;
   }
+  //FILL
 
 
   return malloc (length);
