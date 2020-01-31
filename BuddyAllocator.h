@@ -21,17 +21,8 @@ public:
 	BlockHeader* head;		// you need a head of the list
 public:
 	void insert (BlockHeader* b){	// adds a block to the list
-	  // FILLER CODE
-	  BlockHeader* itr = head;
-	  BlockHeader* shdw = itr;
-	  itr = itr->next;
-
-	  while(itr) {
-	  	shdw = itr;
-	  	itr = itr->next;
-	  }
-		
-	  shdw->next = b;
+	    b->next = head;
+	    head = b;
 	}
 
 	void remove (BlockHeader* b){  // removes a block from the list

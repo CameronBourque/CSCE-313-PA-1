@@ -1,14 +1,34 @@
 #include "BuddyAllocator.h"
 #include <iostream>
+#include <math.h>
 using namespace std;
 
 BuddyAllocator::BuddyAllocator (int _basic_block_size, int _total_memory_length){
   basic_block_size = _basic_block_size, total_memory_size = _total_memory_length;
-  start = (BlockHeader*)(new char[_total_memory_length]); //may do rounding up for powers of 2!!!!
+  total_memory_size = pow(2, (int) ceil(log2(total_memory_size))); //This is used for keeping powers of 2
+  cout << "total mem size: " << total_memory_size << endl;
+  basic_block_size = pow(2, (int) floor(log2(basic_block_size)));
+  cout << "basic block size: " << basic_block_size << endl;
+  start = (BlockHeader*)(new char[total_memory_size]);
+
+  for(int i = (int)log2(basic_block_size); i < (int)log2(total_memory_size); i++){
+      LinkedList temp;
+      FreeList.push_back(tempgit ad);
+  }
+
+  BlockHeader head;
+  head.block_size = total_memory_size;
+  head.is_free = true;
+
+  LinkedList list;
+  list.insert(&head);
+  FreeList[(int)log2(total_memory_size) - (int)log2(basic_block_size)] = list;
 }
 
 BuddyAllocator::~BuddyAllocator (){
-
+  delete start;
+  basic_block_size = 0;
+  total_memory_size = 0;
 }
 
 BlockHeader* BuddyAllocator::getbuddy (BlockHeader * addr){
@@ -51,8 +71,8 @@ BlockHeader* BuddyAllocator::split (BlockHeader* block){
 }
 
 void* BuddyAllocator::alloc(int length) {
-  /* This preliminary implementation simply hands the call over the 
-     the C standard library! 
+  /* This preliminary implementation simply hands the call over the
+     the C standard library!
      Of course this needs to be replaced by your implementation.
   */
   int memSpace = length + sizeof(BlockHeader);
@@ -93,7 +113,7 @@ void BuddyAllocator::printlist (){
       b = b->next;
     }
     cout << count << endl;
-    cout << "Amount of available free memory: " << total_free_memory << " byes" << endl;  
+    cout << "Amount of available free memory: " << total_free_memory << " byes" << endl;
   }
 }
 

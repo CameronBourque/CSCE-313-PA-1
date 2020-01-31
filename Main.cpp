@@ -22,24 +22,22 @@ void easytest(BuddyAllocator* ba){
 int main(int argc, char ** argv) {
 
   int basic_block_size = 128, memory_length = 512 * 1024;
-  int c, b_val, s_val;
+  int c;
   while((c = getopt(argc, argv, "b:s:")) != -1)
   {
       switch(c){
           case 'b':
-              b_val = atoi(optarg);
-              std::cout << "b: " << b_val << std::endl;
+              basic_block_size = atoi(optarg);
+              std::cout << "b: " << basic_block_size << std::endl;
               break;
           case 's':
-              s_val = atoi(optarg);
-              std::cout << "s: " << s_val << std::endl;
+              memory_length = atoi(optarg);
+              std::cout << "s: " << memory_length << std::endl;
               break;
           default:
               std::cout << "Invalid argument" << std::endl;
       }
   }
-	//Replace these by argument result
-
 
   // create memory manager
   BuddyAllocator * allocator = new BuddyAllocator(basic_block_size, memory_length);
