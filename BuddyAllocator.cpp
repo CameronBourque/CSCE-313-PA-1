@@ -13,7 +13,7 @@ BuddyAllocator::BuddyAllocator (int _basic_block_size, int _total_memory_length)
 
   for(int i = (int)log2(basic_block_size); i < (int)log2(total_memory_size); i++){
       LinkedList temp;
-      FreeList.push_back(tempgit ad);
+      FreeList.push_back(temp);
   }
 
   BlockHeader head;
