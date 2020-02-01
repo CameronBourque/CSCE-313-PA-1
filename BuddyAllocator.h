@@ -10,9 +10,12 @@ typedef unsigned int uint;
 class BlockHeader{
 public:
 	// think about what else should be included as member variables
-	bool is_free;  //whether the block of memory is free or not
 	int block_size;  // size of the block
 	BlockHeader* next; // pointer to the next block
+
+	BlockHeader(){
+	    next = NULL;
+	}
 };
 
 class LinkedList{
