@@ -12,16 +12,12 @@ public:
 	// think about what else should be included as member variables
 	int block_size;  // size of the block
 	BlockHeader* next; // pointer to the next block
-
-	BlockHeader(){
-	    next = NULL;
-	}
 };
 
 class LinkedList{
 	// this is a special linked list that is made out of BlockHeader s. 
 public:
-	BlockHeader* head;		// you need a head of the list
+	BlockHeader* head = NULL;		// you need a head of the list
 public:
 	void insert (BlockHeader* b){	// adds a block to the list
 	    b->next = head;
@@ -29,22 +25,24 @@ public:
 	}
 
 	void remove (BlockHeader* b){  // removes a block from the list
-	  //FILLER CODE
+          //FILLER CODE
 	  if(head == b){
 	  	head = head->next;
 	  	return;
 	  }
 		
 	  BlockHeader* itr = head;
-	  while(itr->next != b && itr){
+	  while(itr->next != b && itr->next){
 	  	itr = itr->next;
 	  }
 
-	  if(!itr){
+	  if(!itr->next){
 	  	return;
 	  }
 
 	  itr->next = b->next;
+	  b->next = NULL;
+	  return;
 	}
 };
 
