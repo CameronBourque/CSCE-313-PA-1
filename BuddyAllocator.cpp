@@ -26,6 +26,10 @@ BuddyAllocator::~BuddyAllocator (){
   delete start;
   basic_block_size = 0;
   total_memory_size = 0;
+  for(LinkedList l : FreeList){
+      l.head = NULL;
+  }
+  FreeList.clear();
 }
 
 BlockHeader* BuddyAllocator::getbuddy (BlockHeader * addr){
@@ -76,7 +80,7 @@ void* BuddyAllocator::alloc(int length) {
   }
   
   int i, base;
-  i = (int)ceil(log2(memSpace / basic_block_size));
+  i = (int)ceil(log2(memSpace) - log2(basic_block_size));
   base = i;
 
   while(i < FreeList.size()){
