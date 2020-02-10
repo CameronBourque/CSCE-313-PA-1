@@ -25,25 +25,22 @@ public:
 	}
 
 	void remove (BlockHeader* b){  // removes a block from the list
-          //FILLER CODE
 	  if(head == b){
-	  	head = head->next;
-	  	return;
+	     head = head->next;
+	     b->next = NULL;
+	     return;
 	  }
-		
 	  BlockHeader* itr = head;
-	  while(itr->next != b && itr->next){
-	  	itr = itr->next;
+	  while(itr && itr->next){
+	     if(itr->next == b){
+		itr->next = b->next;
+		b->next = NULL;
+		break;
+	     }
+	     itr = itr->next;
 	  }
-
-	  if(!itr->next){
-	  	return;
-	  }
-
-	  itr->next = b->next;
-	  b->next = NULL;
-	  return;
 	}
+
 };
 
 
@@ -53,7 +50,7 @@ private:
 	vector<LinkedList> FreeList; //each linked list is a block size for easy access for inserts
 	int basic_block_size;
 	int total_memory_size;
-	BlockHeader* start;
+	char* start;
 
 private:
 	/* private function you are required to implement

@@ -9,16 +9,16 @@ BuddyAllocator::BuddyAllocator (int _basic_block_size, int _total_memory_length)
   cout << "total mem size: " << total_memory_size << endl;
   basic_block_size = pow(2, (int) ceil(log2(basic_block_size)));
   cout << "basic block size: " << basic_block_size << endl;
-  start = (BlockHeader*)(new char[total_memory_size]);
+  start = new char[total_memory_size];
 
   for(int i = (int)log2(basic_block_size); i <= (int)log2(total_memory_size); i++){
       FreeList.push_back(*(new LinkedList()));
   }
 
-  BlockHeader *head = start;
+  BlockHeader *head = (BlockHeader*)start;
   head->block_size = total_memory_size;
 
-  FreeList[(int)log2(total_memory_size) - (int)log2(basic_block_size)].insert(head);
+  FreeList[(int)log2(total_memory_size / basic_block_size)].insert(head);
   cout << "inserting start mem block at index " << (int)log2(total_memory_size) - (int)log2(basic_block_size) << endl;
 }
 
@@ -29,18 +29,9 @@ BuddyAllocator::~BuddyAllocator (){
 }
 
 BlockHeader* BuddyAllocator::getbuddy (BlockHeader * addr){
-  int base_addr = (char*)addr - (char*)start;
+  long base_addr = (char*)addr - start;
   base_addr ^= addr->block_size;
-  return (BlockHeader*) ((char*)start + base_addr);
-
-  /* IS THIS NEEDED???
-  if(arebuddies(addr, ret)){
-      return ret;
-  }
-  else{
-      return NULL;
-  }
-  */
+  return (BlockHeader*) (start + base_addr);
 }
 
 bool BuddyAllocator::arebuddies (BlockHeader* block1, BlockHeader* block2){
@@ -66,7 +57,6 @@ BlockHeader* BuddyAllocator::split (BlockHeader* block){
   block->block_size >>= 1; //do this first so it finds the buddy for the split size
   BlockHeader* newBlock = getbuddy(block);
   newBlock->block_size = block->block_size;
-  //Push newBlock and block into freelist (this will set its next)
 
   return newBlock;
 }
@@ -86,13 +76,17 @@ void* BuddyAllocator::alloc(int length) {
   }
   
   int i, base;
-  i = ((int)ceil(log2(memSpace))) - ((int)log2(basic_block_size));
+  i = (int)ceil(log2(memSpace / basic_block_size));
   base = i;
+
   while(i < FreeList.size()){
      if(FreeList[i].head){
 	break;
      }
      i++;
+  }
+  if(i >= FreeList.size()){
+     return NULL;
   }
 
   for(; i > base; i--){
@@ -105,25 +99,29 @@ void* BuddyAllocator::alloc(int length) {
   BlockHeader* ret = FreeList[base].head;
   FreeList[base].remove(ret);
 
-  return ret;
+  return (void*)((char*)ret + sizeof(BlockHeader));
 }
 
 void BuddyAllocator::free(void* a) {
   /* Same here! */
- 
-  int i = ((int)log2(((BlockHeader*)a)->block_size) - (int)log2(basic_block_size));
 
-  BlockHeader* block = (BlockHeader*)a;
+  if(!a) {return;}
+
+  BlockHeader* block = (BlockHeader*)((char*)a - sizeof(BlockHeader));
   BlockHeader* buddy;
+ 
+  int i = (int)log2(block->block_size / basic_block_size);
 
-  for(; block->block_size < total_memory_size && arebuddies(block, (buddy = getbuddy(block))); i++){
+  for(; block->block_size < total_memory_size && arebuddies(block, (buddy = getbuddy(block))) && i < FreeList.size(); i++){
      FreeList[i].remove(block);
      FreeList[i].remove(buddy);
      block = merge(block, buddy);
      FreeList[i+1].insert(block);
   }
 
-  //FILL
+  if(i >= FreeList.size()){
+     //cout << "tried to free memory block larger than total memory" << endl;
+  }
 }
 
 void BuddyAllocator::printlist (){

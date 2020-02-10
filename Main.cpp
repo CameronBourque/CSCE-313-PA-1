@@ -12,6 +12,7 @@ void easytest(BuddyAllocator* ba){
   // allocating a byte
   char * mem = (char *) ba->alloc (1);
   // now print again, how should the list look now
+  cout << "checking list" << endl;
   ba->printlist ();
 
   ba->free (mem); // give back the memory you just allocated
@@ -45,7 +46,9 @@ int main(int argc, char ** argv) {
   // the following won't print anything until you start using FreeList and replace the "new" with your own implementation
   easytest (allocator);
 
-  
+ 
+  cout << "Finished easytest" << endl << endl;
+
   // stress-test the memory manager, do this only after you are done with small test cases
   Ackerman* am = new Ackerman ();
   am->test(allocator); // this is the full-fledged test. 
