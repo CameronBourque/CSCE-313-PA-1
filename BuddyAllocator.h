@@ -12,6 +12,7 @@ public:
 	// think about what else should be included as member variables
 	int block_size;  // size of the block
 	BlockHeader* next; // pointer to the next block
+	bool is_free;
 };
 
 class LinkedList{
@@ -30,13 +31,20 @@ public:
 	     b->next = NULL;
 	     return;
 	  }
+	  
+	  if(!head) {return;}
+
 	  BlockHeader* itr = head;
-	  while(itr && itr->next){
-	     if(itr->next == b){
-		itr->next = b->next;
+	  BlockHeader* shdw = itr;
+	  while(itr){
+	     if(itr == b){
+		shdw->next = b->next;
 		b->next = NULL;
 		break;
 	     }
+	     shdw = itr;
+	     if(!itr || 
+                !itr->next){ break; }
 	     itr = itr->next;
 	  }
 	}
